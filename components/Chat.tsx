@@ -18,30 +18,26 @@ interface Answers {
   first_name: string;
   email: string;
   wedding_date: string;
-  date_of_birth: string;
-  partner_first_name: string;
-  partner_date_of_birth: string;
-  partner_fav_color: string;
-  partner_hobbies: string;
-  partner_love_language: string;
+  spouse_birth: string;
+  spouse_first_name: string;
+  self_birth: string;
+  spouse_love_language: string;
+  self_love_language: string;
+  spouse_favorites: string;
+  self_favorites: string;
+  spouse_traits: string;
+  self_traits: string;
+  spouse_interests: string;
+  self_interests: string;
+  spouse_animal_lover: string;
+  spouse_sports: string;
+  spouse_fears: string;
+  spouse_comforts: string;
+  spouse_enjoy: string;
+  spouse_avoid: string;
 }
 
 const CALCULATOR_URL = 'https://married-more-calculator-5mfl-f9grmy7nq.vercel.app';
-
-const HOBBY_OPTIONS = [
-  'Reading',
-  'Cooking',
-  'Fitness',
-  'Gaming',
-  'Travel',
-  'Music',
-  'Art & Crafts',
-  'Sports',
-  'Movies & TV',
-  'Outdoors',
-  'Photography',
-  'Dancing',
-];
 
 const LOVE_LANGUAGES = [
   'Words of Affirmation',
@@ -49,6 +45,68 @@ const LOVE_LANGUAGES = [
   'Receiving Gifts',
   'Acts of Service',
   'Physical Touch',
+];
+
+const TRAITS_OPTIONS = [
+  'Adventurous',
+  'Thrill-seeker',
+  'Timid',
+  'Romantic',
+  'Efficient',
+  'Playful',
+  'Smart',
+  'Funny',
+  'Athletic',
+  'Active',
+  'Couch-potato',
+  'Artistic',
+  'Quiet',
+  'Loud',
+  'Talkative',
+  'Homebody',
+  'Outgoing',
+  'Organized',
+  'Neat-freak',
+  'Messy',
+  'Morning-person',
+  'Night-owl',
+  'Faith-filled',
+  'Avid-reader',
+  'Saver',
+  'Spender',
+  'Service-oriented',
+  'Family-oriented',
+  'Free-spirit',
+];
+
+const INTEREST_OPTIONS = [
+  'History',
+  'Future',
+  'Sci-Fi',
+  'Gaming',
+  'Animation',
+  'Sports',
+  'Hobbies',
+  'Collector',
+];
+
+const ENJOY_OPTIONS = [
+  'A musical',
+  'A concert',
+  'Live play',
+  'Adventure park',
+  'Museum',
+  'A sporting event',
+  'Road trip',
+  'Beach',
+  'Mountains',
+  'Rivers',
+  'Castles',
+  'Ruins',
+  'International travel',
+  'Domestic travel',
+  'Cruises',
+  'Retreats',
 ];
 
 // Warm acknowledgment messages to use after user responses
@@ -62,18 +120,40 @@ const getAcknowledgment = (field: string, value: string, answers: Answers): stri
       return "Perfect, thank you for sharing that with us!";
     case 'wedding_date':
       return "What a special day to celebrate!";
-    case 'date_of_birth':
+    case 'spouse_birth':
       return "Great, thank you for sharing!";
-    case 'partner_first_name':
+    case 'spouse_first_name':
       return `${value} — what a lovely name!`;
-    case 'partner_date_of_birth':
-      return "Wonderful, we'll make sure to remember that!";
-    case 'partner_fav_color':
-      return `${value} — beautiful choice!`;
-    case 'partner_hobbies':
-      return "Those are wonderful interests! This really helps us find the perfect ideas.";
-    case 'partner_love_language':
-      return `That's beautiful — ${value.toLowerCase()} is such a meaningful way to show love.`;
+    case 'self_birth':
+      return "Wonderful, we'll remember this for your celebrations too.";
+    case 'spouse_love_language':
+      return `Beautiful — ${value.toLowerCase()} is such a meaningful way to show love.`;
+    case 'self_love_language':
+      return `Noted! ${value.toLowerCase()} helps us tailor ideas for you, too.`;
+    case 'spouse_favorites':
+      return "Lovely details — this will help us personalize ideas.";
+    case 'self_favorites':
+      return "Got it — we'll keep your favorites in mind too.";
+    case 'spouse_traits':
+      return "That paints a great picture of your spouse — thank you!";
+    case 'self_traits':
+      return "Great! This helps balance plans for both of you.";
+    case 'spouse_interests':
+      return "Wonderful! Those interests will inspire great ideas.";
+    case 'self_interests':
+      return "Love it — we'll include options you'll both enjoy.";
+    case 'spouse_animal_lover':
+      return "Noted — we'll keep that in mind for experiences.";
+    case 'spouse_sports':
+      return "Perfect — adding those teams to the list.";
+    case 'spouse_fears':
+      return "Thanks for sharing; we'll avoid anything that wouldn't feel good.";
+    case 'spouse_comforts':
+      return "Lovely — we'll lean into those comforts.";
+    case 'spouse_enjoy':
+      return "Great picks — those sound like fun!";
+    case 'spouse_avoid':
+      return "Thanks for flagging; we'll avoid these.";
     default:
       return "Great, thank you for sharing!";
   }
@@ -82,75 +162,151 @@ const getAcknowledgment = (field: string, value: string, answers: Answers): stri
 const chatFlow: Omit<Message, 'id'>[] = [
   {
     type: 'bot',
-    content: "Hey there! Welcome — I'm so glad you're here.",
+    content: "Welcome to MarriedMore! I'm Marry, your personal assistant to help you celebrate your marriage.",
   },
   {
     type: 'bot',
-    content: "Before we dive in, I just want to ask: do we have your permission to store these details? This helps us send you thoughtful reminders and personalized gift ideas.",
-    inputType: 'consent',
-    field: 'consent',
-    options: ['Yes, I\'d love that!', 'No thanks'],
-  },
-  {
-    type: 'bot',
-    content: "Let's start with the basics — what's your first name?",
+    content: "First, what’s your first name?",
     inputType: 'text',
     field: 'first_name',
   },
   {
     type: 'bot',
-    content: "And what's the best email to reach you at? We'll use this to send you helpful reminders.",
+    content: "Thanks! I’ll keep track of details to email timely, thoughtful reminders and personalized gift ideas. Your information is only used by MarriedMore and will never be sold. May I keep these details for you?",
+    inputType: 'consent',
+    field: 'consent',
+    options: ['Yes, please', 'No thanks'],
+  },
+  {
+    type: 'bot',
+    content: "What is your preferred email address to receive these reminders?",
     inputType: 'email',
     field: 'email',
   },
   {
     type: 'bot',
-    content: "Now for the fun stuff! When's your wedding anniversary?",
+    content: "Anniversary date?",
     inputType: 'date',
     field: 'wedding_date',
   },
   {
     type: 'bot',
-    content: "And when's your birthday? We'd love to celebrate you too!",
-    inputType: 'date',
-    field: 'date_of_birth',
-  },
-  {
-    type: 'bot',
-    content: "Now let's talk about your special someone! What's your spouse or partner's first name?",
+    content: "Spouse’s birth month (and specific date if you’d like to share)?",
     inputType: 'text',
-    field: 'partner_first_name',
+    field: 'spouse_birth',
   },
   {
     type: 'bot',
-    content: "When's {{partner_first_name}}'s birthday?",
-    inputType: 'date',
-    field: 'partner_date_of_birth',
-  },
-  {
-    type: 'bot',
-    content: "Here's a fun one — what's {{partner_first_name}}'s favorite color?",
+    content: "What’s your spouse’s first name?",
     inputType: 'text',
-    field: 'partner_fav_color',
+    field: 'spouse_first_name',
   },
   {
     type: 'bot',
-    content: "What hobbies or interests does {{partner_first_name}} absolutely love? Pick as many as you'd like, or add your own!",
-    inputType: 'multi-select',
-    field: 'partner_hobbies',
-    options: HOBBY_OPTIONS,
-    allowCustom: true,
+    content: "Your birth month (and specific date if you’d like to share)?",
+    inputType: 'text',
+    field: 'self_birth',
   },
   {
     type: 'bot',
-    content: "Last question! Which love language do you think fits {{partner_first_name}} best?",
+    content: "Do you know what matters more to your spouse: time together, words of affirmation, touch, acts of service, or receiving gifts?",
     inputType: 'select',
-    field: 'partner_love_language',
+    field: 'spouse_love_language',
     options: LOVE_LANGUAGES,
   },
   {
     type: 'bot',
-    content: "You're amazing, {{first_name}}! Thank you so much for sharing all of this with us. We'll use it to send you thoughtful reminders and perfect gift ideas for {{partner_first_name}}. Taking you to your calculator now...",
+    content: "And what about you? Which love language fits you best?",
+    inputType: 'select',
+    field: 'self_love_language',
+    options: LOVE_LANGUAGES,
+  },
+  {
+    type: 'bot',
+    content: "Describe your spouse’s favorites (color, food, drink, movies, music, art, destinations, adventures, ways to relax).",
+    inputType: 'text',
+    field: 'spouse_favorites',
+  },
+  {
+    type: 'bot',
+    content: "Describe your own favorites too.",
+    inputType: 'text',
+    field: 'self_favorites',
+  },
+  {
+    type: 'bot',
+    content: "Words to describe your spouse’s tendencies? Pick any that fit, or add your own.",
+    inputType: 'multi-select',
+    field: 'spouse_traits',
+    options: TRAITS_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: "And words to describe you?",
+    inputType: 'multi-select',
+    field: 'self_traits',
+    options: TRAITS_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: "What fascinates your spouse? (History, Sci-Fi, Gaming, Collector, etc.)",
+    inputType: 'multi-select',
+    field: 'spouse_interests',
+    options: INTEREST_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: "And what fascinates you?",
+    inputType: 'multi-select',
+    field: 'self_interests',
+    options: INTEREST_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: "Is your spouse an animal lover?",
+    inputType: 'select',
+    field: 'spouse_animal_lover',
+    options: ['Yes', 'No', 'Somewhat'],
+  },
+  {
+    type: 'bot',
+    content: "Any favorite sports team(s)?",
+    inputType: 'text',
+    field: 'spouse_sports',
+  },
+  {
+    type: 'bot',
+    content: "Any fears we should be mindful of?",
+    inputType: 'text',
+    field: 'spouse_fears',
+  },
+  {
+    type: 'bot',
+    content: "Comforts or go-to feel-good things?",
+    inputType: 'text',
+    field: 'spouse_comforts',
+  },
+  {
+    type: 'bot',
+    content: "What would your spouse enjoy? Pick all that fit.",
+    inputType: 'multi-select',
+    field: 'spouse_enjoy',
+    options: ENJOY_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: "Anything they’d want to avoid? (allergies, limitations, dislikes, triggers)",
+    inputType: 'text',
+    field: 'spouse_avoid',
+  },
+  {
+    type: 'bot',
+    content: "You're amazing, {{first_name}}! Thanks for sharing all of this with me. I'll use it to send thoughtful reminders and perfect gift ideas. Taking you to your calculator now...",
   },
 ];
 
@@ -158,19 +314,30 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [inputValue, setInputValue] = useState('');
-  const [selectedHobbies, setSelectedHobbies] = useState<string[]>([]);
-  const [customHobby, setCustomHobby] = useState('');
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [customOption, setCustomOption] = useState('');
   const [answers, setAnswers] = useState<Answers>({
     consent: '',
     first_name: '',
     email: '',
     wedding_date: '',
-    date_of_birth: '',
-    partner_first_name: '',
-    partner_date_of_birth: '',
-    partner_fav_color: '',
-    partner_hobbies: '',
-    partner_love_language: '',
+    spouse_birth: '',
+    spouse_first_name: '',
+    self_birth: '',
+    spouse_love_language: '',
+    self_love_language: '',
+    spouse_favorites: '',
+    self_favorites: '',
+    spouse_traits: '',
+    self_traits: '',
+    spouse_interests: '',
+    self_interests: '',
+    spouse_animal_lover: '',
+    spouse_sports: '',
+    spouse_fears: '',
+    spouse_comforts: '',
+    spouse_enjoy: '',
+    spouse_avoid: '',
   });
   const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -317,8 +484,8 @@ export default function Chat() {
 
     // Clear input and move to next step
     setInputValue('');
-    setSelectedHobbies([]);
-    setCustomHobby('');
+    setSelectedOptions([]);
+    setCustomOption('');
     const nextStep = currentStep + 1;
     setCurrentStep(nextStep);
 
@@ -328,24 +495,24 @@ export default function Chat() {
     }, 300);
   };
 
-  const handleHobbyToggle = (hobby: string) => {
-    setSelectedHobbies((prev) =>
-      prev.includes(hobby)
-        ? prev.filter((h) => h !== hobby)
-        : [...prev, hobby]
+  const handleOptionToggle = (option: string) => {
+    setSelectedOptions((prev) =>
+      prev.includes(option)
+        ? prev.filter((h) => h !== option)
+        : [...prev, option]
     );
   };
 
-  const handleAddCustomHobby = () => {
-    if (customHobby.trim() && !selectedHobbies.includes(customHobby.trim())) {
-      setSelectedHobbies((prev) => [...prev, customHobby.trim()]);
-      setCustomHobby('');
+  const handleAddCustomOption = () => {
+    if (customOption.trim() && !selectedOptions.includes(customOption.trim())) {
+      setSelectedOptions((prev) => [...prev, customOption.trim()]);
+      setCustomOption('');
     }
   };
 
-  const handleSubmitHobbies = () => {
-    if (selectedHobbies.length > 0) {
-      handleSubmit(selectedHobbies.join(', '));
+  const handleSubmitOptions = () => {
+    if (selectedOptions.length > 0) {
+      handleSubmit(selectedOptions.join(', '));
     }
   };
 
@@ -367,6 +534,7 @@ export default function Chat() {
   const showOptions = currentFlow?.options && (currentFlow?.inputType === 'select' || currentFlow?.inputType === 'consent') && !isComplete && !declined;
   const showMultiSelect = currentFlow?.inputType === 'multi-select' && !isComplete && !declined;
   const showDateInput = currentFlow?.inputType === 'date' && !isComplete && !declined;
+  const baseOptions = currentFlow?.options || [];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -484,7 +652,7 @@ export default function Chat() {
                 </div>
               )}
 
-              {/* Multi-Select for Hobbies */}
+              {/* Multi-Select for list questions */}
               {showMultiSelect && (
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-2 justify-center">
@@ -493,48 +661,48 @@ export default function Chat() {
                         key={option}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => handleHobbyToggle(option)}
+                        onClick={() => handleOptionToggle(option)}
                         className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                          selectedHobbies.includes(option)
+                          selectedOptions.includes(option)
                             ? 'option-btn-selected shadow-md'
                             : 'option-btn'
                         }`}
                       >
-                        {selectedHobbies.includes(option) && '✓ '}
+                        {selectedOptions.includes(option) && '✓ '}
                         {option}
                       </motion.button>
                     ))}
-                    {/* Custom hobbies added */}
-                    {selectedHobbies
-                      .filter((h) => !HOBBY_OPTIONS.includes(h))
-                      .map((hobby) => (
+                    {/* Custom options added */}
+                    {selectedOptions
+                      .filter((h) => !baseOptions.includes(h))
+                      .map((option) => (
                         <motion.button
-                          key={hobby}
+                          key={option}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => handleHobbyToggle(hobby)}
+                          onClick={() => handleOptionToggle(option)}
                           className="px-4 py-2.5 rounded-full text-sm font-medium option-btn-selected shadow-md"
                         >
-                          ✓ {hobby}
+                          ✓ {option}
                         </motion.button>
                       ))}
                   </div>
                   
-                  {/* Add custom hobby */}
+                  {/* Add custom option */}
                   {currentFlow.allowCustom && (
                     <div className="flex gap-2 justify-center">
                       <input
                         type="text"
-                        value={customHobby}
-                        onChange={(e) => setCustomHobby(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleAddCustomHobby()}
+                        value={customOption}
+                        onChange={(e) => setCustomOption(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleAddCustomOption()}
                         placeholder="Add another..."
                         className="chat-input px-4 py-2.5 rounded-full text-warm-800 placeholder:text-warm-400 text-sm w-40"
                       />
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={handleAddCustomHobby}
-                        disabled={!customHobby.trim()}
+                        onClick={handleAddCustomOption}
+                        disabled={!customOption.trim()}
                         className="px-4 py-2.5 bg-cream-200 text-warm-600 rounded-full text-sm font-medium disabled:opacity-50 hover:bg-cream-300 transition-colors"
                       >
                         + Add
@@ -542,16 +710,16 @@ export default function Chat() {
                     </div>
                   )}
 
-                  {/* Submit hobbies */}
+                  {/* Submit options */}
                   <div className="flex justify-center pt-2">
                     <motion.button
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleSubmitHobbies}
-                      disabled={selectedHobbies.length === 0}
+                      onClick={handleSubmitOptions}
+                      disabled={selectedOptions.length === 0}
                       className="px-8 py-3.5 option-btn-primary rounded-full font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
                     >
-                      Continue ({selectedHobbies.length} selected)
+                      Continue ({selectedOptions.length} selected)
                     </motion.button>
                   </div>
                 </div>
