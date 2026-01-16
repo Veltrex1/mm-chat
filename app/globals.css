@@ -6,7 +6,7 @@
 
 :root {
   --gradient-warm: linear-gradient(165deg, #faf6f1 0%, #fdf9f3 40%, #f9f4ec 100%);
-  --gradient-coral: linear-gradient(135deg, #d4836c 0%, #e0987f 100%);
+  --gradient-coral: linear-gradient(135deg, #e8b4b8 0%, #dfa5aa 100%);
   --shadow-soft: 0 2px 20px rgba(139, 115, 85, 0.08);
 }
 
@@ -110,8 +110,8 @@ body {
 }
 
 .chat-bubble-user {
-  background: linear-gradient(135deg, #c4785f 0%, #d4896e 100%);
-  box-shadow: 0 4px 12px rgba(196, 120, 95, 0.2);
+  background: linear-gradient(135deg, #e8b4b8 0%, #dfa5aa 100%);
+  box-shadow: 0 4px 12px rgba(232, 180, 184, 0.25);
 }
 
 /* Input styling */
@@ -122,8 +122,8 @@ body {
 }
 
 .chat-input:focus {
-  border-color: #c4785f;
-  box-shadow: 0 0 0 3px rgba(196, 120, 95, 0.1);
+  border-color: #e8b4b8;
+  box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.2);
   outline: none;
 }
 
@@ -136,8 +136,8 @@ body {
 }
 
 .option-btn:hover {
-  border-color: #c4785f;
-  color: #c4785f;
+  border-color: #e8b4b8;
+  color: #b87078;
 }
 
 .option-btn-primary {
@@ -177,5 +177,5 @@ body {
 .decorative-line {
   width: 40px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #c4785f, transparent);
+  background: linear-gradient(90deg, transparent, #e8b4b8, transparent);
 }
