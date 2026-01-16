@@ -35,6 +35,8 @@ interface Answers {
   spouse_comforts: string;
   spouse_enjoy: string;
   spouse_avoid: string;
+  gift_budget: string;
+  gift_style: string;
 }
 
 const CALCULATOR_URL = 'https://married-more-calculator-5mfl-f9grmy7nq.vercel.app';
@@ -109,6 +111,30 @@ const ENJOY_OPTIONS = [
   'Retreats',
 ];
 
+const GIFT_BUDGET_OPTIONS = [
+  'Up to $50',
+  '$50 - $100',
+  '$100 - $250',
+  '$250 - $500',
+  '$500 - $1000',
+  '$1000+',
+  'Prefer to decide per occasion',
+];
+
+const GIFT_STYLE_OPTIONS = [
+  'Experience - weekend trip',
+  'Experience - local outing',
+  'Jewelry',
+  'Photo album or framed print',
+  'Personalized art',
+  'Spa/relaxation',
+  'Tech or gadget',
+  'Subscription/box',
+  'Handwritten/keepsake',
+  'Something practical',
+  'Something sentimental',
+];
+
 // Warm acknowledgment messages to use after user responses
 const getAcknowledgment = (field: string, value: string, answers: Answers): string => {
   switch (field) {
@@ -154,6 +180,10 @@ const getAcknowledgment = (field: string, value: string, answers: Answers): stri
       return "Great picks — those sound like fun!";
     case 'spouse_avoid':
       return "Thanks for flagging; we'll avoid these.";
+    case 'gift_budget':
+      return "Great — that helps us right-size recommendations.";
+    case 'gift_style':
+      return "Perfect, we'll tailor ideas to that vibe.";
     default:
       return "Great, thank you for sharing!";
   }
@@ -306,6 +336,21 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
+    content: "How big of a gift are you thinking? Choose a ballpark budget.",
+    inputType: 'select',
+    field: 'gift_budget',
+    options: GIFT_BUDGET_OPTIONS,
+  },
+  {
+    type: 'bot',
+    content: "What kind of gift feels right? (trip/experience, jewelry, photo album, etc.) Pick all that fit.",
+    inputType: 'multi-select',
+    field: 'gift_style',
+    options: GIFT_STYLE_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
     content: "You're amazing, {{first_name}}! Thanks for sharing all of this with me. I'll use it to send thoughtful reminders and perfect gift ideas. Taking you to your calculator now...",
   },
 ];
@@ -338,6 +383,8 @@ export default function Chat() {
     spouse_comforts: '',
     spouse_enjoy: '',
     spouse_avoid: '',
+    gift_budget: '',
+    gift_style: '',
   });
   const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
