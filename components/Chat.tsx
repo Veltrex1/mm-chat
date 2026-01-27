@@ -210,6 +210,10 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
+    content: "If you don’t know an answer, just type “skip” and I’ll move on.",
+  },
+  {
+    type: 'bot',
     content: "First, what’s your first name?",
     inputType: 'text',
     field: 'first_name',
@@ -536,7 +540,9 @@ export default function Chat() {
   };
 
   const handleSubmit = (value: string) => {
-    if (!value.trim()) return;
+    const trimmed = value.trim();
+    const isSkip = trimmed.toLowerCase() === 'skip';
+    if (!trimmed && !isSkip) return;
 
     const currentFlow = chatFlow[currentStep];
     if (!currentFlow.field) return;
@@ -575,7 +581,8 @@ export default function Chat() {
     setMessages((prev) => [...prev, userMessage]);
 
     // Update answers
-    const newAnswers = { ...answers, [currentFlow.field]: value };
+    const storedValue = isSkip ? 'Skipped' : value;
+    const newAnswers = { ...answers, [currentFlow.field]: storedValue };
     setAnswers(newAnswers);
 
     // Clear input and move to next step
@@ -752,6 +759,14 @@ export default function Chat() {
                       {option}
                     </motion.button>
                   ))}
+                  <motion.button
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleSubmit('skip')}
+                    className="px-6 py-3.5 rounded-full text-sm font-medium option-btn"
+                  >
+                    Skip
+                  </motion.button>
                 </div>
               )}
 
@@ -823,6 +838,14 @@ export default function Chat() {
                       className="px-8 py-3.5 option-btn-primary rounded-full font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
                     >
                       Continue ({selectedOptions.length} selected)
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleSubmit('skip')}
+                      className="ml-3 px-6 py-3.5 rounded-full text-sm font-medium option-btn"
+                    >
+                      Skip
                     </motion.button>
                   </div>
                 </div>
