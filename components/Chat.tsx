@@ -37,6 +37,10 @@ interface Answers {
   spouse_avoid: string;
   gift_budget: string;
   gift_style: string;
+  married_place: string;
+  honeymoon_place: string;
+  meet_story: string;
+  share_results: string;
 }
 
 const CALCULATOR_URL = 'https://married-more-calculator-5mfl-f9grmy7nq.vercel.app';
@@ -184,6 +188,16 @@ const getAcknowledgment = (field: string, value: string, answers: Answers): stri
       return "Great — that helps us right-size recommendations.";
     case 'gift_style':
       return "Perfect, we'll tailor ideas to that vibe.";
+    case 'married_place':
+      return "Beautiful — we'll remember where your story started.";
+    case 'honeymoon_place':
+      return "Lovely! A special spot to keep in mind.";
+    case 'meet_story':
+      return "What a great story — thanks for sharing!";
+    case 'share_results':
+      return value.toLowerCase().includes('yes')
+        ? "Wonderful — we'll prepare a copy for your spouse too."
+        : "Got it — we'll keep the results just for you.";
     default:
       return "Great, thank you for sharing!";
   }
@@ -218,6 +232,24 @@ const chatFlow: Omit<Message, 'id'>[] = [
     content: "Anniversary date?",
     inputType: 'date',
     field: 'wedding_date',
+  },
+  {
+    type: 'bot',
+    content: "Where were you married?",
+    inputType: 'text',
+    field: 'married_place',
+  },
+  {
+    type: 'bot',
+    content: "Where was your honeymoon?",
+    inputType: 'text',
+    field: 'honeymoon_place',
+  },
+  {
+    type: 'bot',
+    content: "What's the story of how you met?",
+    inputType: 'text',
+    field: 'meet_story',
   },
   {
     type: 'bot',
@@ -351,6 +383,13 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
+    content: "Would you like your spouse to receive the results as well?",
+    inputType: 'select',
+    field: 'share_results',
+    options: ['Yes, please send to my spouse too', 'No, just for me'],
+  },
+  {
+    type: 'bot',
     content: "You're amazing, {{first_name}}! Thanks for sharing all of this with me. I'll use it to send thoughtful reminders and perfect gift ideas. Taking you to your calculator now...",
   },
 ];
@@ -385,6 +424,10 @@ export default function Chat() {
     spouse_avoid: '',
     gift_budget: '',
     gift_style: '',
+    married_place: '',
+    honeymoon_place: '',
+    meet_story: '',
+    share_results: '',
   });
   const [isTyping, setIsTyping] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
