@@ -634,6 +634,7 @@ export default function Chat() {
   const showMultiSelect = currentFlow?.inputType === 'multi-select' && !isComplete && !declined;
   const showDateInput = currentFlow?.inputType === 'date' && !isComplete && !declined;
   const baseOptions = currentFlow?.options || [];
+  const needsInputBar = (showInput || showOptions || showMultiSelect || showDateInput) && !isTyping;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -714,6 +715,8 @@ export default function Chat() {
           </AnimatePresence>
 
           <div ref={messagesEndRef} />
+          {/* Spacer so buttons/inputs don’t overlap latest message */}
+          <div className={needsInputBar ? 'h-36' : 'h-8'} />
         </div>
       </main>
 
