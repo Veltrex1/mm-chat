@@ -434,18 +434,22 @@ export default function Chat() {
   const [isSaving, setIsSaving] = useState(false);
   const [declined, setDeclined] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
   const autoScrollThreshold = 120; // px from bottom to auto-scroll
 
   const isNearBottom = () => {
-    if (typeof document === 'undefined') return false;
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    const node = messagesContainerRef.current;
+    if (!node) return false;
+    const { scrollTop, scrollHeight, clientHeight } = node;
     return scrollHeight - (scrollTop + clientHeight) < autoScrollThreshold;
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ block: 'end' });
+    const node = messagesContainerRef.current;
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
   };
 
   useEffect(() => {
@@ -653,8 +657,12 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-44">
-        <div className="space-y-4">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-24">
+        <div
+          ref={messagesContainerRef}
+          className="space-y-4 overflow-y-auto pr-1"
+          style={{ maxHeight: 'calc(100vh - 220px)' }}
+        >
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
               <motion.div
@@ -716,7 +724,7 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
           {/* Spacer so buttons/inputs don’t overlap latest message */}
-          <div className={needsInputBar ? 'h-36' : 'h-8'} />
+          <div className={needsInputBar ? 'h-28' : 'h-6'} />
         </div>
       </main>
 
