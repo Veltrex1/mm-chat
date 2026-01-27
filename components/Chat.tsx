@@ -393,13 +393,22 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
+  const autoScrollThreshold = 120; // px from bottom to auto-scroll
+
+  const isNearBottom = () => {
+    if (typeof document === 'undefined') return false;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    return scrollHeight - (scrollTop + clientHeight) < autoScrollThreshold;
+  };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ block: 'end' });
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   useEffect(() => {
