@@ -652,7 +652,7 @@ export default function Chat() {
           <h1 className="brand-title text-4xl md:text-5xl">
             MarriedMore
           </h1>
-          <p className="text-warm-500 mt-2 text-sm tracking-wide">Building stronger partnerships</p>
+          <p className="text-warm-500 mt-2 text-sm tracking-wide">Loving Lasting Marriage</p>
         </motion.div>
       </header>
 
