@@ -674,9 +674,9 @@ export default function Chat() {
                 className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 ${
+                    className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 ${
                     message.type === 'user'
-                      ? 'chat-bubble-user text-white rounded-br-sm'
+                      ? 'chat-bubble-user text-warm-900 rounded-br-sm'
                       : 'chat-bubble-bot text-warm-800 rounded-bl-sm'
                   }`}
                 >
