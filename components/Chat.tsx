@@ -490,9 +490,9 @@ export default function Chat() {
     // If this step doesn't require input, move to next
     if (!step.inputType && !step.options) {
       if (stepIndex === chatFlow.length - 1) {
-        // Final message - save and redirect
+        // Final message - save and finish
         setIsComplete(true);
-        await saveAndRedirect();
+        await saveAndFinish();
       } else {
         setTimeout(() => {
           setCurrentStep(stepIndex + 1);
@@ -521,7 +521,7 @@ export default function Chat() {
     }, 800);
   };
 
-  const saveAndRedirect = async () => {
+  const saveAndFinish = async () => {
     setIsSaving(true);
     try {
       await fetch('/api/chat', {
@@ -532,11 +532,7 @@ export default function Chat() {
     } catch (error) {
       console.error('Failed to save:', error);
     }
-    
-    // Redirect after a brief moment
-    setTimeout(() => {
-      window.location.href = CALCULATOR_URL;
-    }, 2500);
+    setIsSaving(false);
   };
 
   const handleSubmit = (value: string) => {
@@ -563,12 +559,9 @@ export default function Chat() {
         const declineMessage: Message = {
           id: `decline-${Date.now()}`,
           type: 'bot',
-          content: "No problem at all — we totally understand! You can still use our calculator. Taking you there now...",
+          content: "No problem at all — we totally understand! Thanks for stopping by.",
         };
         setMessages((prev) => [...prev, declineMessage]);
-        setTimeout(() => {
-          window.location.href = CALCULATOR_URL;
-        }, 2000);
       }, 400);
       return;
     }
@@ -716,7 +709,7 @@ export default function Chat() {
               >
                 <div className="text-center">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-coral-200 border-t-coral-500 animate-spin"></div>
-                  <p className="text-warm-600">Taking you to your calculator...</p>
+                  <p className="text-warm-600">Saving your answers...</p>
                 </div>
               </motion.div>
             )}
