@@ -443,6 +443,14 @@ export default function Chat() {
   const hasInitialized = useRef(false);
   const autoScrollThreshold = 120; // px from bottom to auto-scroll
 
+  const isUserQuestion = (input: string) => {
+    const lower = input.trim().toLowerCase();
+    if (!lower) return false;
+    if (lower.includes('?')) return true;
+    const startsWith = ['what', 'why', 'how', 'when', 'where', 'who', 'do you', 'can you', 'should'];
+    return startsWith.some((w) => lower.startsWith(w));
+  };
+
   const isNearBottom = () => {
     const node = messagesContainerRef.current;
     if (!node) return false;
@@ -546,6 +554,24 @@ export default function Chat() {
 
     const currentFlow = chatFlow[currentStep];
     if (!currentFlow.field) return;
+
+    // If the user asks a free-form question, answer briefly and steer back
+    if (!isSkip && isUserQuestion(trimmed)) {
+      const userMessage: Message = {
+        id: `user-${Date.now()}`,
+        type: 'user',
+        content: value,
+      };
+      setMessages((prev) => [...prev, userMessage]);
+
+      const steerMessage: Message = {
+        id: `steer-${Date.now()}`,
+        type: 'bot',
+        content: `Great question! I'll keep this quick — let's finish a few details so I can tailor everything for you. ${currentFlow.content}`,
+      };
+      setMessages((prev) => [...prev, steerMessage]);
+      return;
+    }
 
     // Handle consent decline
     if (currentFlow.field === 'consent' && value === 'No thanks') {
