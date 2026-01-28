@@ -441,7 +441,7 @@ export default function Chat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
-  const autoScrollThreshold = 120; // px from bottom to auto-scroll
+  const autoScrollThreshold = 300; // px from bottom to auto-scroll (more forgiving)
 
   const isUserQuestion = (input: string) => {
     const lower = input.trim().toLowerCase();
@@ -461,7 +461,12 @@ export default function Chat() {
   const scrollToBottom = () => {
     const node = messagesContainerRef.current;
     if (!node) return;
-    node.scrollTop = node.scrollHeight;
+    // Use rAF to ensure DOM has rendered the latest message height
+    requestAnimationFrame(() => {
+      const n = messagesContainerRef.current;
+      if (!n) return;
+      n.scrollTop = n.scrollHeight;
+    });
   };
 
   useEffect(() => {
@@ -498,6 +503,10 @@ export default function Chat() {
     };
 
     setMessages((prev) => [...prev, newMessage]);
+    // Auto-scroll for bot messages only if user was near bottom
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
 
     // If this step doesn't require input, move to next
     if (!step.inputType && !step.options) {
@@ -605,6 +614,7 @@ export default function Chat() {
       content: value,
     };
     setMessages((prev) => [...prev, userMessage]);
+    scrollToBottom(); // always keep user in view after their action
 
     // Update answers
     const storedValue = isSkip ? 'Skipped' : value;
