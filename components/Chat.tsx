@@ -682,7 +682,7 @@ export default function Chat() {
       const steerMessage: Message = {
         id: `steer-${Date.now()}`,
         type: 'bot',
-        content: `You asked: “${trimmed}.” Quick answer: ${quickAnswer} Let's keep going: ${currentFlow.content}`,
+        content: `Quick answer: ${quickAnswer} Let's keep going: ${currentFlow.content}`,
       };
       setMessages((prev) => [...prev, steerMessage]);
       scrollToBottom();
