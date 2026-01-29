@@ -238,6 +238,108 @@ const FAQS: FAQ[] = [
       'Start by finding your MarriedMore date with the calculator; then explore ideas, sign up for reminders, or browse curated resources.',
     keywords: ['get started', 'start', 'begin'],
   },
+  {
+    question: 'Are you a real person?',
+    answer:
+      'I’m a virtual assistant created to help with MarriedMore; not human, but built with real care and intention.',
+    keywords: ['real person', 'are you real', 'human'],
+  },
+  {
+    question: 'Who created MarriedMore?',
+    answer:
+      'MarriedMore was created by Karen and Tom Peck to celebrate lasting love, inspired by a milestone in their own story.',
+    keywords: ['who created', 'karen', 'tom peck', 'founder'],
+  },
+  {
+    question: 'Why did you create MarriedMore?',
+    answer:
+      'To honor marriage beyond the wedding day—through years of simple traditions, reflection, and intentional care.',
+    keywords: ['why create', 'why did you create', 'purpose'],
+  },
+  {
+    question: 'Is this just another anniversary?',
+    answer:
+      'No. A MarriedMore date is a once-in-a-lifetime milestone based on how long you’ve been married relative to your life, not a calendar anniversary.',
+    keywords: ['another anniversary', 'just anniversary', 'same as anniversary'],
+  },
+  {
+    question: 'What if my spouse isn’t into celebrating?',
+    answer:
+      'That’s okay. MarriedMore is flexible—celebration can be simple or quiet; even a private acknowledgment counts.',
+    keywords: ['spouse not into', 'not celebrate', 'doesnt like celebrating'],
+  },
+  {
+    question: 'Do I have to buy something to use MarriedMore?',
+    answer:
+      'No. MarriedMore is about awareness and intention first; products and ideas are optional.',
+    keywords: ['buy', 'purchase', 'have to buy'],
+  },
+  {
+    question: 'Is MarriedMore only for couples who are doing well?',
+    answer:
+      'Not at all—MarriedMore is for every season, including couples feeling disconnected or navigating challenges.',
+    keywords: ['only for couples doing well', 'struggling', 'not doing well'],
+  },
+  {
+    question: 'Can I use MarriedMore for a gift idea?',
+    answer:
+      'Yes—many people use their MarriedMore date as inspiration for meaningful gifts that honor commitment and longevity.',
+    keywords: ['gift idea', 'use for gift', 'gift inspiration'],
+  },
+  {
+    question: 'What if I don’t know our exact wedding date?',
+    answer:
+      'Estimate it and the calculator will give a close approximation. You can update it later if you find the exact date.',
+    keywords: ['dont know wedding date', 'unknown wedding date', 'exact date'],
+  },
+  {
+    question: 'Will you remind both of us?',
+    answer:
+      'You can sign up individually or together; each person can choose to receive reminders at their own email.',
+    keywords: ['remind both', 'both of us', 'reminders both'],
+  },
+  {
+    question: 'How often will you email me?',
+    answer:
+      'Only around your MarriedMore date, plus occasional thoughtful updates—we avoid inbox clutter.',
+    keywords: ['how often email', 'email frequency', 'emails often'],
+  },
+  {
+    question: 'Can I unsubscribe anytime?',
+    answer:
+      'Yes—every email includes an unsubscribe link; opt out anytime.',
+    keywords: ['unsubscribe', 'opt out', 'stop emails'],
+  },
+  {
+    question: 'Does MarriedMore offer advice or counseling?',
+    answer:
+      'We are not counseling, but we share thoughtful guidance, resources, and ideas to encourage healthy connection.',
+    keywords: ['counseling', 'advice', 'therapy'],
+  },
+  {
+    question: 'Is this meant to replace counseling or coaching?',
+    answer:
+      'No—MarriedMore complements professional support; it doesn’t replace counseling or coaching.',
+    keywords: ['replace counseling', 'replace therapy', 'replace coaching'],
+  },
+  {
+    question: 'What makes MarriedMore different?',
+    answer:
+      'We focus on one meaningful milestone and build simple, intentional practices around it—without pressure or perfection.',
+    keywords: ['different', 'unique', 'why different'],
+  },
+  {
+    question: 'Is MarriedMore free to use?',
+    answer:
+      'Yes—finding your MarriedMore date and many resources are free; optional products or services may cost extra.',
+    keywords: ['free', 'cost', 'price'],
+  },
+  {
+    question: 'Can I share this with friends or family?',
+    answer:
+      'Absolutely—MarriedMore is often shared as a thoughtful idea for couples, anniversaries, or long-term celebrations.',
+    keywords: ['share', 'friends', 'family'],
+  },
 ];
 
 // Warm acknowledgment messages to use after user responses
