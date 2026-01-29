@@ -139,6 +139,107 @@ const GIFT_STYLE_OPTIONS = [
   'Something sentimental',
 ];
 
+type FAQ = { question: string; answer: string; keywords: string[] };
+
+const FAQS: FAQ[] = [
+  {
+    question: 'What is MarriedMore?',
+    answer:
+      'MarriedMore is a simple way to celebrate lasting love—helping couples recognize milestones, build small traditions, and intentionally invest over time.',
+    keywords: ['what is marriedmore', 'marriedmore', 'about'],
+  },
+  {
+    question: 'What is a MarriedMore date?',
+    answer:
+      "Your MarriedMore date is the day you've been married longer than not—a unique milestone that reflects the depth and longevity of your commitment.",
+    keywords: ['marriedmore date', 'what is', 'date meaning'],
+  },
+  {
+    question: 'How do I find my MarriedMore date?',
+    answer:
+      'Use the MarriedMore Calculator—enter your wedding date to instantly see when you reach your MarriedMore milestone.',
+    keywords: ['find', 'calculator', 'how do i', 'marriedmore date'],
+  },
+  {
+    question: 'Do both spouses have a MarriedMore date?',
+    answer:
+      'Yes—each spouse has their own MarriedMore date based on their life timeline, often very close together.',
+    keywords: ['both spouses', 'each spouse', 'own date'],
+  },
+  {
+    question: 'Why is the MarriedMore date meaningful?',
+    answer:
+      'It marks when marriage becomes the majority of your shared life—honoring endurance, growth, and love over time.',
+    keywords: ['meaningful', 'why', 'important'],
+  },
+  {
+    question: 'Do we need to celebrate in a big way?',
+    answer:
+      'Not at all—simple, intentional moments (quiet dinner, handwritten note, time together) are encouraged.',
+    keywords: ['celebrate', 'big way', 'how celebrate'],
+  },
+  {
+    question: 'Can you remind us when our MarriedMore date is coming up?',
+    answer:
+      'Yes—sign up for gentle email reminders as your MarriedMore date approaches so you don’t forget to celebrate.',
+    keywords: ['remind', 'reminders', 'coming up'],
+  },
+  {
+    question: 'How often will we get emails?',
+    answer:
+      'Only around your MarriedMore date—typically ~30 days, 7 days, and 1 day before. Nothing excessive.',
+    keywords: ['how often', 'emails', 'frequency'],
+  },
+  {
+    question: 'Do you sell products?',
+    answer:
+      'Yes—we curate thoughtful, symbolic gifts and meaningful items that align with intentional celebration.',
+    keywords: ['sell products', 'products', 'merch', 'gifts'],
+  },
+  {
+    question: 'Do you hold inventory or ship products yourselves?',
+    answer:
+      'We partner with trusted suppliers/makers to deliver directly, focusing on quality and curation.',
+    keywords: ['inventory', 'ship', 'suppliers'],
+  },
+  {
+    question: 'Is MarriedMore faith-based?',
+    answer:
+      'MarriedMore values commitment, intention, and lasting love. It’s welcoming to all couples.',
+    keywords: ['faith', 'religious', 'faith-based'],
+  },
+  {
+    question: 'Is this only for long-married couples?',
+    answer:
+      'No—couples at any stage can benefit, whether newly married or decades in.',
+    keywords: ['only for long', 'newly married', 'stage'],
+  },
+  {
+    question: 'What if we’re in a hard season of marriage?',
+    answer:
+      'We support couples in all seasons—sometimes celebration looks like reassurance, guidance, or a reminder that your marriage is worth investing in.',
+    keywords: ['hard season', 'struggling', 'difficult'],
+  },
+  {
+    question: 'Can MarriedMore help us reconnect?',
+    answer:
+      'We don’t replace counseling, but offer reminders, ideas, and resources that encourage intentional connection.',
+    keywords: ['reconnect', 'help us reconnect', 'counseling'],
+  },
+  {
+    question: 'Is our information private?',
+    answer:
+      'Yes—your information is private and not sold; it’s only used to support your MarriedMore experience.',
+    keywords: ['private', 'privacy', 'sell data', 'information'],
+  },
+  {
+    question: 'How can we get started?',
+    answer:
+      'Start by finding your MarriedMore date with the calculator; then explore ideas, sign up for reminders, or browse curated resources.',
+    keywords: ['get started', 'start', 'begin'],
+  },
+];
+
 // Warm acknowledgment messages to use after user responses
 const getAcknowledgment = (field: string, value: string, answers: Answers): string => {
   switch (field) {
@@ -573,8 +674,11 @@ export default function Chat() {
       };
       setMessages((prev) => [...prev, userMessage]);
 
-      const quickAnswer =
-        "MarriedMore is a small team focused on helping couples celebrate with timely reminders and thoughtful gift ideas.";
+      const lower = trimmed.toLowerCase();
+      const matched = FAQS.find((faq) => faq.keywords.some((k) => lower.includes(k)));
+      const quickAnswer = matched
+        ? matched.answer
+        : "MarriedMore helps couples celebrate milestones with reminders, ideas, and curated gifts.";
       const steerMessage: Message = {
         id: `steer-${Date.now()}`,
         type: 'bot',
