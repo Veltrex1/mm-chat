@@ -479,16 +479,18 @@ const chatFlow: Omit<Message, 'id'>[] = [
   {
     type: 'bot',
     content: "Do you know what matters more to your spouse: time together, words of affirmation, touch, acts of service, or receiving gifts?",
-    inputType: 'select',
+    inputType: 'multi-select',
     field: 'spouse_love_language',
     options: LOVE_LANGUAGES,
+    allowCustom: false,
   },
   {
     type: 'bot',
     content: "And what about you? Which love language fits you best?",
-    inputType: 'select',
+    inputType: 'multi-select',
     field: 'self_love_language',
     options: LOVE_LANGUAGES,
+    allowCustom: false,
   },
   {
     type: 'bot',
