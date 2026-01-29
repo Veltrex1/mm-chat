@@ -573,10 +573,12 @@ export default function Chat() {
       };
       setMessages((prev) => [...prev, userMessage]);
 
+      const quickAnswer =
+        "MarriedMore is a small team focused on helping couples celebrate with timely reminders and thoughtful gift ideas.";
       const steerMessage: Message = {
         id: `steer-${Date.now()}`,
         type: 'bot',
-        content: `I hear your question: “${trimmed}.” Quick answer: I'm here to help plan reminders and thoughtful gifts for you two — I'll tailor specifics once we finish these details. Let's continue: ${currentFlow.content}`,
+        content: `You asked: “${trimmed}.” Quick answer: ${quickAnswer} Let's keep going: ${currentFlow.content}`,
       };
       setMessages((prev) => [...prev, steerMessage]);
       scrollToBottom();
