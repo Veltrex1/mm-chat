@@ -775,6 +775,7 @@ export default function Chat() {
         content: value,
       };
       setMessages((prev) => [...prev, userMessage]);
+      setInputValue('');
 
       const lower = trimmed.toLowerCase();
       const matched = FAQS.find((faq) => faq.keywords.some((k) => lower.includes(k)));
