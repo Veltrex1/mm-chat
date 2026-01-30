@@ -905,7 +905,7 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-24">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-32">
         <div
           ref={messagesContainerRef}
           className="space-y-4 overflow-y-auto pr-1"
@@ -972,7 +972,7 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
           {/* Spacer so buttons/inputs don’t overlap latest message */}
-          <div className={needsInputBar ? 'h-28' : 'h-6'} />
+          <div className={needsInputBar ? 'h-44' : 'h-8'} />
         </div>
       </main>
 
