@@ -141,6 +141,25 @@ const GIFT_STYLE_OPTIONS = [
 
 type FAQ = { question: string; answer: string; keywords: string[] };
 
+const normalize = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const getFaqAnswer = (input: string): string | undefined => {
+  const needle = normalize(input);
+  for (const faq of FAQS) {
+    const q = normalize(faq.question);
+    const hits = faq.keywords.some((k) => needle.includes(k));
+    const questionOverlap =
+      q.split(' ').filter((w) => w.length > 2 && needle.includes(w)).length >= 2;
+    if (hits || questionOverlap) return faq.answer;
+  }
+  return undefined;
+};
+
 const FAQS: FAQ[] = [
   {
     question: 'What is MarriedMore?',
@@ -779,17 +798,20 @@ export default function Chat() {
       setMessages((prev) => [...prev, userMessage]);
       setInputValue('');
 
-      const lower = trimmed.toLowerCase();
-      const matched = FAQS.find((faq) => faq.keywords.some((k) => lower.includes(k)));
-      const quickAnswer = matched
-        ? matched.answer
-        : "MarriedMore helps couples celebrate milestones with reminders, ideas, and curated gifts.";
+      const quickAnswer =
+        getFaqAnswer(trimmed) ||
+        'MarriedMore helps couples celebrate milestones with reminders, ideas, and curated gifts.';
       const steerMessage: Message = {
         id: `steer-${Date.now()}`,
         type: 'bot',
-        content: `Quick answer: ${quickAnswer} Let's keep going: ${currentFlow.content}`,
+        content: `Quick answer: ${quickAnswer}`,
       };
-      setMessages((prev) => [...prev, steerMessage]);
+      const promptRepeat: Message = {
+        id: `repeat-${Date.now()}`,
+        type: 'bot',
+        content: `Let's keep going: ${currentFlow.content}`,
+      };
+      setMessages((prev) => [...prev, steerMessage, promptRepeat]);
       scrollToBottom();
       return;
     }
