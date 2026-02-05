@@ -173,6 +173,13 @@ const detectIntent = (input: string): Intent => {
   return null;
 };
 
+const intentReply = (intent: Intent) => {
+  if (intent === 'gift') return 'Sure—happy to help with gift ideas.';
+  if (intent === 'reminder') return 'Got it—you want reminders noted.';
+  if (intent === 'trip') return 'A trip sounds great—I’ll keep that in mind.';
+  return '';
+};
+
 const buildSummary = (mode: Mode, a: Answers) => {
   if (mode === 'gift') {
     return `Gift summary: style=${a.gift_style || 'unspecified'}, budget=${a.gift_budget || 'unspecified'}, favorites=${a.spouse_favorites || 'unspecified'}.`;
@@ -737,6 +744,7 @@ export default function Chat() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [customOption, setCustomOption] = useState('');
   const [mode, setMode] = useState<Mode>('general');
+  const [lastUserIntent, setLastUserIntent] = useState<Intent | null>(null);
   const [answers, setAnswers] = useState<Answers>({
     consent: '',
     first_name: '',
@@ -822,6 +830,22 @@ export default function Chat() {
     });
   };
 
+  const enqueueResumeQuestion = (flowIndex: number) => {
+    const flow = getFlow(mode);
+    const step = flow[flowIndex];
+    if (!step) return;
+    const resumeMessage: Message = {
+      id: `resume-${Date.now()}`,
+      type: 'bot',
+      content: processContent(step.content),
+      inputType: step.inputType,
+      options: step.options,
+      field: step.field,
+      allowCustom: step.allowCustom,
+    };
+    setMessages((prev) => [...prev, resumeMessage]);
+  };
+
   const addBotMessage = async (stepIndex: number) => {
     const flow = getFlow(mode);
     if (stepIndex >= flow.length) return;
@@ -896,14 +920,11 @@ export default function Chat() {
     const isSkip = trimmed.toLowerCase() === 'skip';
     if (!trimmed && !isSkip) return;
 
-    // Intent detection: switch modes if user shifts topics mid-flow
+    // Intent detection: acknowledge topic change but keep flow, then resume
     const detected = detectIntent(trimmed);
     if (!isSkip && detected && detected !== mode) {
-      const newMode = detected;
-      const flow = getFlow(newMode);
-      setMode(newMode);
-      setCurrentStep(0);
-      setInputValue('');
+      setLastUserIntent(detected);
+      const intentMsg = intentReply(detected);
       setMessages((prev) => [
         ...prev,
         {
@@ -912,16 +933,19 @@ export default function Chat() {
           content: value,
         },
         {
-          id: `switch-${Date.now()}`,
+          id: `ack-${Date.now()}`,
           type: 'bot',
-          content: newMode === 'gift'
-            ? 'Got it—you want gift ideas. I’ll ask a couple of quick things.'
-            : newMode === 'reminder'
-              ? 'Sure—I can set reminders. Just a couple details.'
-              : 'Trip vibes—sounds fun. A few quick questions.',
+          content: intentMsg || 'Got it.',
+        },
+        {
+          id: `resume-${Date.now()}`,
+          type: 'bot',
+          content: 'Let’s keep going.',
         },
       ]);
-      setTimeout(() => addBotMessage(0), 400);
+      setInputValue('');
+      enqueueResumeQuestion(currentStep);
+      scrollToBottom();
       return;
     }
 
@@ -931,6 +955,7 @@ export default function Chat() {
     // If the user asks a free-form question, answer briefly and steer back
     if (!isSkip && isUserQuestion(trimmed)) {
       const intent = detectIntent(trimmed);
+      setLastUserIntent(intent);
       const userMessage: Message = {
         id: `user-${Date.now()}`,
         type: 'user',
@@ -941,36 +966,28 @@ export default function Chat() {
 
       let quickAnswer =
         getFaqAnswer(trimmed) ||
-        'MarriedMore helps couples celebrate milestones with reminders, ideas, and curated gifts.';
-      let clarifying: string | null = null;
+        'I hear you—MarriedMore is about thoughtful reminders, ideas, and gifts for your marriage.';
 
-      if (intent === 'gift') {
-        quickAnswer = 'Got it—you’re looking for gift ideas. I’ll tailor suggestions once I know a bit more.';
-        clarifying = 'What feels right: experience, jewelry, keepsake, or something practical?';
-      } else if (intent === 'reminder') {
-        quickAnswer = 'Sure, I can note reminders for you.';
-        clarifying = 'When would you like reminders? (30/7/1 days before are common)';
+      if (intent) {
+        const intentMsg = intentReply(intent);
+        if (intentMsg) quickAnswer = intentMsg;
       }
 
-      const steerMessage: Message = {
-        id: `steer-${Date.now()}`,
-        type: 'bot',
-        content: `Quick answer: ${quickAnswer}`,
-      };
-      const messagesToAdd: Message[] = [steerMessage];
-      if (clarifying) {
-        messagesToAdd.push({
-          id: `clarify-${Date.now()}`,
+      const messagesToAdd: Message[] = [
+        {
+          id: `steer-${Date.now()}`,
           type: 'bot',
-          content: clarifying,
-        });
-      }
-      messagesToAdd.push({
-        id: `repeat-${Date.now()}`,
-        type: 'bot',
-        content: `Let's keep going: ${currentFlow.content}`,
-      });
+          content: `Quick answer: ${quickAnswer}`,
+        },
+        {
+          id: `resume-${Date.now()}`,
+          type: 'bot',
+          content: 'Let’s pick up where we left off.',
+        },
+      ];
+
       setMessages((prev) => [...prev, ...messagesToAdd]);
+      enqueueResumeQuestion(currentStep);
       scrollToBottom();
       return;
     }
