@@ -45,6 +45,8 @@ interface Answers {
 
 const CALCULATOR_URL = 'https://married-more-calculator-5mfl-f9grmy7nq.vercel.app';
 
+type Mode = 'general' | 'gift' | 'reminder' | 'trip';
+
 const LOVE_LANGUAGES = [
   'Words of Affirmation',
   'Quality Time',
@@ -160,16 +162,99 @@ const getFaqAnswer = (input: string): string | undefined => {
   return undefined;
 };
 
-type Intent = 'gift' | 'reminder' | null;
+type Intent = 'gift' | 'reminder' | 'trip' | null;
 
 const detectIntent = (input: string): Intent => {
   const needle = normalize(input);
   const has = (words: string[]) => words.some((w) => needle.includes(w));
+  if (has(['trip', 'travel', 'getaway', 'vacation'])) return 'trip';
   if (has(['gift', 'present', 'surprise', 'keepsake'])) return 'gift';
   if (has(['remind', 'reminder', 'notify', 'remember'])) return 'reminder';
   return null;
 };
 
+const buildSummary = (mode: Mode, a: Answers) => {
+  if (mode === 'gift') {
+    return `Gift summary: style=${a.gift_style || 'unspecified'}, budget=${a.gift_budget || 'unspecified'}, favorites=${a.spouse_favorites || 'unspecified'}.`;
+  }
+  if (mode === 'reminder') {
+    return `Reminder summary: email=${a.email || 'unspecified'}, anniversary=${a.wedding_date || 'unspecified'}, share=${a.share_results || 'unspecified'}.`;
+  }
+  if (mode === 'trip') {
+    return `Trip summary: vibe=${a.spouse_enjoy || 'unspecified'}, avoid=${a.spouse_avoid || 'unspecified'}, budget=${a.gift_budget || 'unspecified'}.`;
+  }
+  return `Summary: name=${a.first_name || 'unspecified'}, email=${a.email || 'unspecified'}, anniversary=${a.wedding_date || 'unspecified'}.`;
+};
+
+const giftFlow: Omit<Message, 'id'>[] = [
+  {
+    type: 'bot',
+    content: 'What kind of gift feels right? (experience, jewelry, keepsake, practical)',
+    inputType: 'multi-select',
+    field: 'gift_style',
+    options: GIFT_STYLE_OPTIONS,
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: 'How much would you like to spend?',
+    inputType: 'select',
+    field: 'gift_budget',
+    options: GIFT_BUDGET_OPTIONS,
+  },
+  {
+    type: 'bot',
+    content: "Any favorites I should know? Colors, interests, love languages, comforts?",
+    inputType: 'text',
+    field: 'spouse_favorites',
+  },
+];
+
+const reminderFlow: Omit<Message, 'id'>[] = [
+  {
+    type: 'bot',
+    content: 'What email should I use for reminders?',
+    inputType: 'email',
+    field: 'email',
+  },
+  {
+    type: 'bot',
+    content: "When’s your anniversary?",
+    inputType: 'date',
+    field: 'wedding_date',
+  },
+  {
+    type: 'bot',
+    content: 'Would you like your spouse to receive reminders too?',
+    inputType: 'select',
+    field: 'share_results',
+    options: ['Yes, please send to my spouse too', 'No, just for me'],
+  },
+];
+
+const tripFlow: Omit<Message, 'id'>[] = [
+  {
+    type: 'bot',
+    content: 'What kind of trip vibe sounds good? (beach, mountains, city, cozy, adventure)',
+    inputType: 'multi-select',
+    field: 'spouse_enjoy',
+    options: ['Beach', 'Mountains', 'City', 'Adventure park', 'Road trip', 'Cozy stay', 'Cruise', 'International travel', 'Domestic travel'],
+    allowCustom: true,
+  },
+  {
+    type: 'bot',
+    content: 'Any constraints or avoid list? (allergies, dislikes, limitations)',
+    inputType: 'text',
+    field: 'spouse_avoid',
+  },
+  {
+    type: 'bot',
+    content: 'Rough budget for the trip?',
+    inputType: 'select',
+    field: 'gift_budget',
+    options: GIFT_BUDGET_OPTIONS,
+  },
+];
 const FAQS: FAQ[] = [
   {
     question: 'What is MarriedMore?',
@@ -632,12 +717,26 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
 ];
 
+const getFlow = (mode: Mode) => {
+  switch (mode) {
+    case 'gift':
+      return giftFlow;
+    case 'reminder':
+      return reminderFlow;
+    case 'trip':
+      return tripFlow;
+    default:
+      return chatFlow;
+  }
+};
+
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [customOption, setCustomOption] = useState('');
+  const [mode, setMode] = useState<Mode>('general');
   const [answers, setAnswers] = useState<Answers>({
     consent: '',
     first_name: '',
@@ -676,6 +775,7 @@ export default function Chat() {
   const inputRef = useRef<HTMLInputElement>(null);
   const hasInitialized = useRef(false);
   const autoScrollThreshold = 300; // px from bottom to auto-scroll (more forgiving)
+  const activeFlow = getFlow(mode);
 
   const isUserQuestion = (input: string) => {
     const lower = input.trim().toLowerCase();
@@ -714,7 +814,7 @@ export default function Chat() {
       hasInitialized.current = true;
       addBotMessage(0);
     }
-  }, []);
+  }, [mode]);
 
   const processContent = (content: string) => {
     return content.replace(/\{\{(\w+)\}\}/g, (_, key) => {
@@ -723,13 +823,14 @@ export default function Chat() {
   };
 
   const addBotMessage = async (stepIndex: number) => {
-    if (stepIndex >= chatFlow.length) return;
+    const flow = getFlow(mode);
+    if (stepIndex >= flow.length) return;
 
     setIsTyping(true);
     await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
     setIsTyping(false);
 
-    const step = chatFlow[stepIndex];
+    const step = flow[stepIndex];
     const newMessage: Message = {
       id: `msg-${Date.now()}`,
       ...step,
@@ -744,7 +845,7 @@ export default function Chat() {
 
     // If this step doesn't require input, move to next
     if (!step.inputType && !step.options) {
-      if (stepIndex === chatFlow.length - 1) {
+      if (stepIndex === flow.length - 1) {
         // Final message - save and finish
         setIsComplete(true);
         await saveAndFinish();
@@ -795,7 +896,36 @@ export default function Chat() {
     const isSkip = trimmed.toLowerCase() === 'skip';
     if (!trimmed && !isSkip) return;
 
-    const currentFlow = chatFlow[currentStep];
+    // Intent detection: switch modes if user shifts topics mid-flow
+    const detected = detectIntent(trimmed);
+    if (!isSkip && detected && detected !== mode) {
+      const newMode = detected;
+      const flow = getFlow(newMode);
+      setMode(newMode);
+      setCurrentStep(0);
+      setInputValue('');
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `user-${Date.now()}`,
+          type: 'user',
+          content: value,
+        },
+        {
+          id: `switch-${Date.now()}`,
+          type: 'bot',
+          content: newMode === 'gift'
+            ? 'Got it—you want gift ideas. I’ll ask a couple of quick things.'
+            : newMode === 'reminder'
+              ? 'Sure—I can set reminders. Just a couple details.'
+              : 'Trip vibes—sounds fun. A few quick questions.',
+        },
+      ]);
+      setTimeout(() => addBotMessage(0), 400);
+      return;
+    }
+
+    const currentFlow = activeFlow[currentStep];
     if (!currentFlow.field) return;
 
     // If the user asks a free-form question, answer briefly and steer back
@@ -889,6 +1019,24 @@ export default function Chat() {
     setSelectedOptions([]);
     setCustomOption('');
     const nextStep = currentStep + 1;
+
+    const flowLength = activeFlow.length;
+    if (nextStep >= flowLength) {
+      setCurrentStep(flowLength);
+      setIsComplete(true);
+      const summary = buildSummary(mode, newAnswers);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `summary-${Date.now()}`,
+          type: 'bot',
+          content: summary,
+        },
+      ]);
+      saveAndFinish();
+      return;
+    }
+
     setCurrentStep(nextStep);
 
     // Add acknowledgment then next question (with warm delay)
@@ -931,7 +1079,7 @@ export default function Chat() {
     return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  const currentFlow = chatFlow[currentStep];
+  const currentFlow = activeFlow[currentStep];
   const showInput = currentFlow?.inputType && !isComplete && !declined;
   const showOptions = currentFlow?.options && (currentFlow?.inputType === 'select' || currentFlow?.inputType === 'consent') && !isComplete && !declined;
   const showMultiSelect = currentFlow?.inputType === 'multi-select' && !isComplete && !declined;
