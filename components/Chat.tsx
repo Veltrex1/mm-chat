@@ -846,6 +846,34 @@ export default function Chat() {
     setMessages((prev) => [...prev, resumeMessage]);
   };
 
+  const goBack = () => {
+    const flow = getFlow(mode);
+    if (currentStep <= 0) return;
+    const prevStep = currentStep - 1;
+    setIsComplete(false);
+    setDeclined(false);
+    setCurrentStep(prevStep);
+    setInputValue('');
+    setSelectedOptions([]);
+    setCustomOption('');
+    const prev = flow[prevStep];
+    if (prev) {
+      setMessages((prevMsgs) => [
+        ...prevMsgs,
+        {
+          id: `back-${Date.now()}`,
+          type: 'bot',
+          content: `Let's revisit: ${processContent(prev.content)}`,
+          inputType: prev.inputType,
+          options: prev.options,
+          field: prev.field,
+          allowCustom: prev.allowCustom,
+        },
+      ]);
+      scrollToBottom();
+    }
+  };
+
   const addBotMessage = async (stepIndex: number) => {
     const flow = getFlow(mode);
     if (stepIndex >= flow.length) return;
@@ -918,6 +946,11 @@ export default function Chat() {
   const handleSubmit = (value: string) => {
     const trimmed = value.trim();
     const isSkip = trimmed.toLowerCase() === 'skip';
+    const isBack = trimmed.toLowerCase() === 'back';
+    if (isBack) {
+      goBack();
+      return;
+    }
     if (!trimmed && !isSkip) return;
 
     // Intent detection: acknowledge topic change but keep flow, then resume
@@ -1212,6 +1245,15 @@ export default function Chat() {
               {/* Consent / Single Select Buttons */}
               {showOptions && (
                 <div className="flex flex-wrap gap-3 justify-center mt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={goBack}
+                    disabled={currentStep === 0}
+                    className="px-5 py-3 rounded-full text-sm font-medium option-btn"
+                  >
+                    Back
+                  </motion.button>
                   {currentFlow.options?.map((option) => (
                     <motion.button
                       key={option}
@@ -1243,6 +1285,17 @@ export default function Chat() {
               {/* Multi-Select for list questions */}
               {showMultiSelect && (
                 <div className="space-y-4 mt-4">
+                  <div className="flex justify-center">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={goBack}
+                      disabled={currentStep === 0}
+                      className="px-5 py-3 rounded-full text-sm font-medium option-btn"
+                    >
+                      Back
+                    </motion.button>
+                  </div>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {currentFlow.options?.map((option) => (
                       <motion.button
@@ -1323,7 +1376,16 @@ export default function Chat() {
 
               {/* Date Input */}
               {showDateInput && (
-                <div className="flex gap-3 justify-center">
+                <div className="flex gap-3 justify-center mt-3">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={goBack}
+                    disabled={currentStep === 0}
+                    className="px-5 py-3 rounded-full text-sm font-medium option-btn"
+                  >
+                    Back
+                  </motion.button>
                   <input
                     ref={inputRef}
                     type="date"
@@ -1358,7 +1420,16 @@ export default function Chat() {
 
               {/* Text/Email Input */}
               {showInput && currentFlow.inputType !== 'select' && currentFlow.inputType !== 'consent' && currentFlow.inputType !== 'multi-select' && currentFlow.inputType !== 'date' && (
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={goBack}
+                    disabled={currentStep === 0}
+                    className="px-5 py-3 rounded-full text-sm font-medium option-btn"
+                  >
+                    Back
+                  </motion.button>
                   <input
                     ref={inputRef}
                     type={currentFlow.inputType}
