@@ -174,10 +174,18 @@ const detectIntent = (input: string): Intent => {
 };
 
 const intentReply = (intent: Intent) => {
-  if (intent === 'gift') return 'Sure—happy to help with gift ideas.';
-  if (intent === 'reminder') return 'Got it—you want reminders noted.';
-  if (intent === 'trip') return 'A trip sounds great—I’ll keep that in mind.';
+  if (intent === 'gift') return 'Okay—happy to help with gift ideas.';
+  if (intent === 'reminder') return 'Got it—I can note reminders.';
+  if (intent === 'trip') return 'Okay—a trip sounds good.';
   return '';
+};
+
+const detectEmotion = (input: string): string | null => {
+  const text = normalize(input);
+  if (text.match(/\bexcited|happy|thrilled|pumped\b/)) return 'I love the enthusiasm.';
+  if (text.match(/\bstress|overwhelmed|worried|anxious\b/)) return 'I hear you—it can feel like a lot.';
+  if (text.match(/\bsentimental|emotional|heartfelt\b/)) return 'I get it—this matters.';
+  return null;
 };
 
 const buildSummary = (mode: Mode, a: Answers) => {
@@ -204,14 +212,14 @@ const giftFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: 'How much would you like to spend?',
+    content: 'About how much would you like to spend?',
     inputType: 'select',
     field: 'gift_budget',
     options: GIFT_BUDGET_OPTIONS,
   },
   {
     type: 'bot',
-    content: "Any favorites I should know? Colors, interests, love languages, comforts?",
+    content: "Any favorites I should know? Colors, interests, comforts?",
     inputType: 'text',
     field: 'spouse_favorites',
   },
@@ -232,7 +240,7 @@ const reminderFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: 'Would you like your spouse to receive reminders too?',
+    content: 'Should your spouse get reminders too?',
     inputType: 'select',
     field: 'share_results',
     options: ['Yes, please send to my spouse too', 'No, just for me'],
@@ -250,7 +258,7 @@ const tripFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: 'Any constraints or avoid list? (allergies, dislikes, limitations)',
+    content: 'Any constraints or avoid list? (allergies, dislikes, limits)',
     inputType: 'text',
     field: 'spouse_avoid',
   },
@@ -467,103 +475,103 @@ const FAQS: FAQ[] = [
 const getAcknowledgment = (field: string, value: string, answers: Answers): string => {
   switch (field) {
     case 'consent':
-      return "Wonderful! We're so happy to have you here.";
+      return "Thanks for letting me keep this.";
     case 'first_name':
-      return `It's so lovely to meet you, ${value}!`;
+      return `Nice to meet you, ${value}.`;
     case 'email':
-      return "Perfect, thank you for sharing that with us!";
+      return "Okay, noted.";
     case 'wedding_date':
-      return "What a special day to celebrate!";
+      return "Thanks, got the date.";
     case 'spouse_birth':
-      return "Great, thank you for sharing!";
+      return "Noted.";
     case 'spouse_first_name':
-      return `${value} — what a lovely name!`;
+      return `${value}—got it.`;
     case 'self_birth':
-      return "Wonderful, we'll remember this for your celebrations too.";
+      return "Thanks, I've got that.";
     case 'spouse_love_language':
-      return `Beautiful — ${value.toLowerCase()} is such a meaningful way to show love.`;
+      return "Noted for your spouse.";
     case 'self_love_language':
-      return `Noted! ${value.toLowerCase()} helps us tailor ideas for you, too.`;
+      return "Noted for you.";
     case 'spouse_favorites':
-      return "Lovely details — this will help us personalize ideas.";
+      return "Thanks for sharing favorites.";
     case 'self_favorites':
-      return "Got it — we'll keep your favorites in mind too.";
+      return "Got it.";
     case 'spouse_traits':
-      return "That paints a great picture of your spouse — thank you!";
+      return "Noted.";
     case 'self_traits':
-      return "Great! This helps balance plans for both of you.";
+      return "Thanks, noted.";
     case 'spouse_interests':
-      return "Wonderful! Those interests will inspire great ideas.";
+      return "Interests saved.";
     case 'self_interests':
-      return "Love it — we'll include options you'll both enjoy.";
+      return "Saved.";
     case 'spouse_animal_lover':
-      return "Noted — we'll keep that in mind for experiences.";
+      return "Noted.";
     case 'spouse_sports':
-      return "Perfect — adding those teams to the list.";
+      return "Added.";
     case 'spouse_fears':
-      return "Thanks for sharing; we'll avoid anything that wouldn't feel good.";
+      return "We’ll avoid that.";
     case 'spouse_comforts':
-      return "Lovely — we'll lean into those comforts.";
+      return "Comforts saved.";
     case 'spouse_enjoy':
-      return "Great picks — those sound like fun!";
+      return "Saved.";
     case 'spouse_avoid':
-      return "Thanks for flagging; we'll avoid these.";
+      return "We’ll avoid that.";
     case 'gift_budget':
-      return "Great — that helps us right-size recommendations.";
+      return "Okay, budget noted.";
     case 'gift_style':
-      return "Perfect, we'll tailor ideas to that vibe.";
+      return "Got the vibe.";
     case 'married_place':
-      return "Beautiful — we'll remember where your story started.";
+      return "Saved.";
     case 'honeymoon_place':
-      return "Lovely! A special spot to keep in mind.";
+      return "Saved.";
     case 'meet_story':
-      return "What a great story — thanks for sharing!";
+      return "Story saved.";
     case 'share_results':
       return value.toLowerCase().includes('yes')
-        ? "Wonderful — we'll prepare a copy for your spouse too."
-        : "Got it — we'll keep the results just for you.";
+        ? "Okay, I’ll include your spouse."
+        : "Got it—just you.";
     default:
-      return "Great, thank you for sharing!";
+      return "Noted.";
   }
 };
 
 const chatFlow: Omit<Message, 'id'>[] = [
   {
     type: 'bot',
-    content: "Welcome to MarriedMore! I'm Marry, your personal assistant to help you celebrate your marriage.",
+    content: "Hi, I'm Marry. I’ll help you celebrate your marriage.",
   },
   {
     type: 'bot',
-    content: "If you don’t know an answer, just type “skip” and I’ll move on.",
+    content: "If you don’t know an answer, type “skip” and I’ll move on.",
   },
   {
     type: 'bot',
-    content: "First, what’s your first name?",
+    content: "What’s your first name?",
     inputType: 'text',
     field: 'first_name',
   },
   {
     type: 'bot',
-    content: "Thanks! I’ll keep track of details to email timely, thoughtful reminders and personalized gift ideas. Your information is only used by MarriedMore and will never be sold. May I keep these details for you?",
+    content: "I’ll only use this to help you—never sold. May I keep these details for you?",
     inputType: 'consent',
     field: 'consent',
     options: ['Yes, please', 'No thanks'],
   },
   {
     type: 'bot',
-    content: "What is your preferred email address to receive these reminders?",
+    content: "What’s the best email to reach you?",
     inputType: 'email',
     field: 'email',
   },
   {
     type: 'bot',
-    content: "Anniversary date?",
+    content: "What’s your anniversary date?",
     inputType: 'date',
     field: 'wedding_date',
   },
   {
     type: 'bot',
-    content: "Where were you married?",
+    content: "Where did you get married?",
     inputType: 'text',
     field: 'married_place',
   },
@@ -575,13 +583,13 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "What's the story of how you met?",
+    content: "Quick story—how did you meet?",
     inputType: 'text',
     field: 'meet_story',
   },
   {
     type: 'bot',
-    content: "Spouse’s birth month (and specific date if you’d like to share)?",
+    content: "What’s your spouse’s birth month (date if you’d like)?",
     inputType: 'text',
     field: 'spouse_birth',
   },
@@ -593,13 +601,13 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "Your birth month (and specific date if you’d like to share)?",
+    content: "What’s your birth month (date if you’d like)?",
     inputType: 'text',
     field: 'self_birth',
   },
   {
     type: 'bot',
-    content: "Do you know what matters more to your spouse: time together, words of affirmation, touch, acts of service, or receiving gifts?",
+    content: "What matters most to your spouse? (time, words, touch, service, gifts)",
     inputType: 'multi-select',
     field: 'spouse_love_language',
     options: LOVE_LANGUAGES,
@@ -607,7 +615,7 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "And what about you? Which love language fits you best?",
+    content: "And for you—what fits best?",
     inputType: 'multi-select',
     field: 'self_love_language',
     options: LOVE_LANGUAGES,
@@ -973,7 +981,7 @@ export default function Chat() {
         {
           id: `resume-${Date.now()}`,
           type: 'bot',
-          content: 'Let’s keep going.',
+          content: 'We can pick up where we left off.',
         },
       ]);
       setInputValue('');
