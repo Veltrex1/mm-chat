@@ -1104,6 +1104,12 @@ export default function Chat() {
   const baseOptions = currentFlow?.options || [];
   const needsInputBar = (showInput || showOptions || showMultiSelect || showDateInput) && !isTyping;
 
+  useEffect(() => {
+    if (isNearBottom() || needsInputBar) {
+      scrollToBottom();
+    }
+  }, [messages, needsInputBar]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -1121,11 +1127,11 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-32">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-40">
         <div
           ref={messagesContainerRef}
           className="space-y-4 overflow-y-auto pr-1"
-          style={{ maxHeight: 'calc(100vh - 220px)' }}
+          style={{ maxHeight: 'calc(100vh - 200px)' }}
         >
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
@@ -1188,7 +1194,7 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
           {/* Spacer so buttons/inputs don’t overlap latest message */}
-          <div className={needsInputBar ? 'h-44' : 'h-8'} />
+          <div className={needsInputBar ? 'h-56' : 'h-12'} />
         </div>
       </main>
 
@@ -1205,7 +1211,7 @@ export default function Chat() {
             <div className="max-w-2xl mx-auto">
               {/* Consent / Single Select Buttons */}
               {showOptions && (
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-wrap gap-3 justify-center mt-4">
                   {currentFlow.options?.map((option) => (
                     <motion.button
                       key={option}
@@ -1236,7 +1242,7 @@ export default function Chat() {
 
               {/* Multi-Select for list questions */}
               {showMultiSelect && (
-                <div className="space-y-4">
+                <div className="space-y-4 mt-4">
                   <div className="flex flex-wrap gap-2 justify-center">
                     {currentFlow.options?.map((option) => (
                       <motion.button
