@@ -1149,9 +1149,8 @@ export default function Chat() {
   };
 
   const handleSubmitOptions = () => {
-    if (selectedOptions.length > 0) {
-      handleSubmit(selectedOptions.join(', '));
-    }
+    if (selectedOptions.length === 0) return;
+    handleSubmit(selectedOptions.join(', '));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
