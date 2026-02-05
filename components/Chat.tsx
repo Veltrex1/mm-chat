@@ -753,6 +753,12 @@ export default function Chat() {
   const [customOption, setCustomOption] = useState('');
   const [mode, setMode] = useState<Mode>('general');
   const [lastUserIntent, setLastUserIntent] = useState<Intent | null>(null);
+  const [facts, setFacts] = useState<{
+    email?: string;
+    anniversary?: string;
+    budget?: string;
+    location?: string;
+  }>({});
   const [answers, setAnswers] = useState<Answers>({
     consent: '',
     first_name: '',
@@ -806,6 +812,15 @@ export default function Chat() {
     if (!node) return false;
     const { scrollTop, scrollHeight, clientHeight } = node;
     return scrollHeight - (scrollTop + clientHeight) < autoScrollThreshold;
+  };
+
+  const formatFacts = () => {
+    const parts = [];
+    if (facts.email) parts.push(`email: ${facts.email}`);
+    if (facts.anniversary) parts.push(`anniversary: ${facts.anniversary}`);
+    if (facts.budget) parts.push(`budget: ${facts.budget}`);
+    if (facts.location) parts.push(`location: ${facts.location}`);
+    return parts.length ? parts.join(', ') : 'no saved details yet';
   };
 
   const scrollToBottom = () => {
@@ -918,6 +933,15 @@ export default function Chat() {
     }
   };
 
+  useEffect(() => {
+    setFacts({
+      email: answers.email || undefined,
+      anniversary: answers.wedding_date || undefined,
+      budget: answers.gift_budget || undefined,
+      location: answers.married_place || answers.honeymoon_place || undefined,
+    });
+  }, [answers]);
+
   const addAcknowledgmentThenNextQuestion = async (field: string, value: string, newAnswers: Answers, nextStep: number) => {
     // Add acknowledgment message
     setIsTyping(true);
@@ -1005,6 +1029,8 @@ export default function Chat() {
       setMessages((prev) => [...prev, userMessage]);
       setInputValue('');
 
+      const emotion = detectEmotion(trimmed);
+
       let quickAnswer =
         getFaqAnswer(trimmed) ||
         'I hear you—MarriedMore is about thoughtful reminders, ideas, and gifts for your marriage.';
@@ -1014,11 +1040,15 @@ export default function Chat() {
         if (intentMsg) quickAnswer = intentMsg;
       }
 
+      if (!intent && !getFaqAnswer(trimmed)) {
+        quickAnswer = `So far I have ${formatFacts()}. To help, I need: ${currentFlow.content}`;
+      }
+
       const messagesToAdd: Message[] = [
         {
           id: `steer-${Date.now()}`,
           type: 'bot',
-          content: `Quick answer: ${quickAnswer}`,
+          content: emotion ? `${emotion} Quick answer: ${quickAnswer}` : `Quick answer: ${quickAnswer}`,
         },
         {
           id: `resume-${Date.now()}`,
