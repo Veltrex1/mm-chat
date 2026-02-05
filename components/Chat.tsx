@@ -160,6 +160,16 @@ const getFaqAnswer = (input: string): string | undefined => {
   return undefined;
 };
 
+type Intent = 'gift' | 'reminder' | null;
+
+const detectIntent = (input: string): Intent => {
+  const needle = normalize(input);
+  const has = (words: string[]) => words.some((w) => needle.includes(w));
+  if (has(['gift', 'present', 'surprise', 'keepsake'])) return 'gift';
+  if (has(['remind', 'reminder', 'notify', 'remember'])) return 'reminder';
+  return null;
+};
+
 const FAQS: FAQ[] = [
   {
     question: 'What is MarriedMore?',
@@ -790,6 +800,7 @@ export default function Chat() {
 
     // If the user asks a free-form question, answer briefly and steer back
     if (!isSkip && isUserQuestion(trimmed)) {
+      const intent = detectIntent(trimmed);
       const userMessage: Message = {
         id: `user-${Date.now()}`,
         type: 'user',
@@ -798,20 +809,38 @@ export default function Chat() {
       setMessages((prev) => [...prev, userMessage]);
       setInputValue('');
 
-      const quickAnswer =
+      let quickAnswer =
         getFaqAnswer(trimmed) ||
         'MarriedMore helps couples celebrate milestones with reminders, ideas, and curated gifts.';
+      let clarifying: string | null = null;
+
+      if (intent === 'gift') {
+        quickAnswer = 'Got it—you’re looking for gift ideas. I’ll tailor suggestions once I know a bit more.';
+        clarifying = 'What feels right: experience, jewelry, keepsake, or something practical?';
+      } else if (intent === 'reminder') {
+        quickAnswer = 'Sure, I can note reminders for you.';
+        clarifying = 'When would you like reminders? (30/7/1 days before are common)';
+      }
+
       const steerMessage: Message = {
         id: `steer-${Date.now()}`,
         type: 'bot',
         content: `Quick answer: ${quickAnswer}`,
       };
-      const promptRepeat: Message = {
+      const messagesToAdd: Message[] = [steerMessage];
+      if (clarifying) {
+        messagesToAdd.push({
+          id: `clarify-${Date.now()}`,
+          type: 'bot',
+          content: clarifying,
+        });
+      }
+      messagesToAdd.push({
         id: `repeat-${Date.now()}`,
         type: 'bot',
         content: `Let's keep going: ${currentFlow.content}`,
-      };
-      setMessages((prev) => [...prev, steerMessage, promptRepeat]);
+      });
+      setMessages((prev) => [...prev, ...messagesToAdd]);
       scrollToBottom();
       return;
     }
