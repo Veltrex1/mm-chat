@@ -174,9 +174,9 @@ const detectIntent = (input: string): Intent => {
 };
 
 const intentReply = (intent: Intent) => {
-  if (intent === 'gift') return 'Okay—happy to help with gift ideas.';
-  if (intent === 'reminder') return 'Got it—I can note reminders.';
-  if (intent === 'trip') return 'Okay—a trip sounds good.';
+  if (intent === 'gift') return 'Happy to help with gift ideas.';
+  if (intent === 'reminder') return 'I can set reminders for you.';
+  if (intent === 'trip') return 'A trip sounds lovely.';
   return '';
 };
 
@@ -538,7 +538,7 @@ const getAcknowledgment = (field: string, value: string, answers: Answers): stri
 const chatFlow: Omit<Message, 'id'>[] = [
   {
     type: 'bot',
-    content: "Hi, I'm Marry. I’ll help you celebrate your marriage.",
+    content: "Hi, I’m Marry—here to help you celebrate your marriage.",
   },
   {
     type: 'bot',
@@ -552,7 +552,7 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "I’ll only use this to help you—never sold. May I keep these details for you?",
+    content: "I’ll only use this to help—never sold. May I keep these details for you?",
     inputType: 'consent',
     field: 'consent',
     options: ['Yes, please', 'No thanks'],
@@ -583,13 +583,13 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "Quick story—how did you meet?",
+    content: "How did you two meet?",
     inputType: 'text',
     field: 'meet_story',
   },
   {
     type: 'bot',
-    content: "What’s your spouse’s birth month (date if you’d like)?",
+    content: "What’s your spouse’s birth month? (Date if you’d like.)",
     inputType: 'text',
     field: 'spouse_birth',
   },
@@ -601,7 +601,7 @@ const chatFlow: Omit<Message, 'id'>[] = [
   },
   {
     type: 'bot',
-    content: "What’s your birth month (date if you’d like)?",
+    content: "What’s your birth month? (Date if you’d like.)",
     inputType: 'text',
     field: 'self_birth',
   },
@@ -1048,7 +1048,7 @@ export default function Chat() {
         {
           id: `resume-${Date.now()}`,
           type: 'bot',
-          content: 'Let’s pick up where we left off.',
+          content: 'We can pick up where we left off.',
         },
       ];
 
