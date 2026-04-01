@@ -808,9 +808,8 @@ export default function Chat() {
   };
 
   const isNearBottom = () => {
-    const node = messagesContainerRef.current;
-    if (!node) return false;
-    const { scrollTop, scrollHeight, clientHeight } = node;
+    if (typeof document === 'undefined') return false;
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
     return scrollHeight - (scrollTop + clientHeight) < autoScrollThreshold;
   };
 
@@ -824,13 +823,9 @@ export default function Chat() {
   };
 
   const scrollToBottom = () => {
-    const node = messagesContainerRef.current;
-    if (!node) return;
-    // Use rAF to ensure DOM has rendered the latest message height
+    if (typeof document === 'undefined') return;
     requestAnimationFrame(() => {
-      const n = messagesContainerRef.current;
-      if (!n) return;
-      n.scrollTop = n.scrollHeight;
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     });
   };
 
@@ -1197,11 +1192,10 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-40">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-48">
         <div
           ref={messagesContainerRef}
-          className="space-y-4 overflow-y-auto pr-1"
-          style={{ maxHeight: 'calc(100vh - 200px)' }}
+          className="space-y-4 pr-1"
         >
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
@@ -1264,7 +1258,7 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
           {/* Spacer so buttons/inputs don’t overlap latest message */}
-          <div className={needsInputBar ? 'h-56' : 'h-12'} />
+          <div className={needsInputBar ? 'h-64' : 'h-16'} />
         </div>
       </main>
 
