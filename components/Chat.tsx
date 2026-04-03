@@ -798,6 +798,8 @@ export default function Chat() {
   const hasInitialized = useRef(false);
   const autoScrollThreshold = 300; // px from bottom to auto-scroll (more forgiving)
   const activeFlow = getFlow(mode);
+  const [userScrolling, setUserScrolling] = useState(false);
+  const scrollPauseRef = useRef<NodeJS.Timeout | null>(null);
 
   const isUserQuestion = (input: string) => {
     const lower = input.trim().toLowerCase();
@@ -830,10 +832,10 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    if (isNearBottom()) {
+    if (!userScrolling && isNearBottom()) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, userScrolling]);
 
   useEffect(() => {
     if (currentStep === 0 && !hasInitialized.current) {
@@ -936,6 +938,21 @@ export default function Chat() {
       location: answers.married_place || answers.honeymoon_place || undefined,
     });
   }, [answers]);
+
+  useEffect(() => {
+    const handleUserScroll = () => {
+      setUserScrolling(true);
+      if (scrollPauseRef.current) clearTimeout(scrollPauseRef.current);
+      scrollPauseRef.current = setTimeout(() => setUserScrolling(false), 1200);
+    };
+    window.addEventListener('wheel', handleUserScroll, { passive: true });
+    window.addEventListener('touchmove', handleUserScroll, { passive: true });
+    return () => {
+      window.removeEventListener('wheel', handleUserScroll);
+      window.removeEventListener('touchmove', handleUserScroll);
+      if (scrollPauseRef.current) clearTimeout(scrollPauseRef.current);
+    };
+  }, []);
 
   const addAcknowledgmentThenNextQuestion = async (field: string, value: string, newAnswers: Answers, nextStep: number) => {
     // Add acknowledgment message
@@ -1170,10 +1187,10 @@ export default function Chat() {
   const needsInputBar = (showInput || showOptions || showMultiSelect || showDateInput) && !isTyping;
 
   useEffect(() => {
-    if (isNearBottom() || needsInputBar) {
+    if (!userScrolling && (isNearBottom() || needsInputBar)) {
       scrollToBottom();
     }
-  }, [messages, needsInputBar]);
+  }, [messages, needsInputBar, userScrolling]);
 
   return (
     <div className="min-h-screen flex flex-col">
