@@ -751,6 +751,7 @@ export default function Chat() {
   const [inputValue, setInputValue] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [customOption, setCustomOption] = useState('');
+
   const [mode, setMode] = useState<Mode>('general');
   const [lastUserIntent, setLastUserIntent] = useState<Intent | null>(null);
   const [facts, setFacts] = useState<{
@@ -1193,7 +1194,7 @@ export default function Chat() {
   }, [messages, needsInputBar, userScrolling]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-visible chat-shell">
       {/* Header */}
       <header className="py-8 px-4 text-center">
         <motion.div
@@ -1209,7 +1210,7 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-56 min-h-screen">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-56 min-h-screen overflow-visible">
         <div
           ref={messagesContainerRef}
           className="space-y-4 pr-1 overflow-visible"
