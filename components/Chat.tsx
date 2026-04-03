@@ -1192,10 +1192,10 @@ export default function Chat() {
       </header>
 
       {/* Chat Container */}
-      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-48">
+      <main className="flex-1 max-w-2xl w-full mx-auto px-4 pb-56 min-h-screen">
         <div
           ref={messagesContainerRef}
-          className="space-y-4 pr-1"
+          className="space-y-4 pr-1 overflow-visible"
         >
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
@@ -1258,7 +1258,7 @@ export default function Chat() {
 
           <div ref={messagesEndRef} />
           {/* Spacer so buttons/inputs don’t overlap latest message */}
-          <div className={needsInputBar ? 'h-64' : 'h-16'} />
+          <div className={needsInputBar ? 'h-72' : 'h-16'} />
         </div>
       </main>
 
